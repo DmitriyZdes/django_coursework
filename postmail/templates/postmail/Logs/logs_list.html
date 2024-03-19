@@ -1,0 +1,28 @@
+<{% extends 'postmail/base.html' %}
+{% block content %}
+<h2 class="display-2 text-center mb-4">Отчет</h2>
+<div class="table-responsive">
+    <table class="table text-center">
+        <thead>
+        <tr>
+            <th scope="col">Наименование рассылки</th>
+            <th scope="col">Кому</th>
+            <th scope="col">Последняя попытка</th>
+            <th scope="col">Статус</th>
+            <th scope="col">Ответ сервера</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for object in object_list %}
+        <tr>
+            <td>{{ object.mail }}</td>
+            <td>{{ object.logs_owner }}</td>
+            <td>{{ object.last_mail_time }}</td>
+            <td>{{ object.status }}</td>
+            <td>{{ object.response }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -8,11 +8,7 @@ class LogsAdmin(admin.ModelAdmin):
     list_display = ('mail', 'last_mail_time', 'status', 'response',)
 
 
-@admin.register(Mail)
-class MailAdmin(admin.ModelAdmin):
-    list_display = ('name', 'client', 'message', 'start_date', 'nest-date', 'end_date', 'status',)
-    list_filter = ('is_active', 'status',)
-    search_fields = ('name', 'client', 'start_date', 'end_date',)
+admin.site.register(Mail)
 
 
 @admin.register(Client)
