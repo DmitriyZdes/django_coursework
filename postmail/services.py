@@ -7,13 +7,13 @@ from postmail.models import Mail, Logs
 
 
 def send_mail(obj: Mail):
-    for obj_email in obj.client_email.all():
+    for obj_email in obj.client.all():
         try:
             email = EmailMultiAlternatives(
-                subject=obj.mail_title.title,
+                subject=obj.name.title,
                 body=obj.mail_title.text,
                 from_email=settings.DEFAULT_FROM_EMAIL,
-                to=[obj_email.client_email],
+                to=[obj_email.client],
             )
             now = datetime.now()
             now = timezone.make_aware(now, timezone.get_current_timezone())
@@ -31,7 +31,7 @@ def send_mail(obj: Mail):
                 send_name=obj.mail_title.title,
                 last_try=now,
                 status_try='Ошибка',
-                logs_owner=obj.options_owner,
+                logs_owner=obj.mail_owner,
                 server_answer=e,
                 send_email=obj_email.client_email
             )
@@ -51,23 +51,23 @@ def job():
     for obj in mailing_list:
         if obj.is_active:
             if now - timedelta(minutes=1) < obj.next_try < now + timedelta(minutes=1):
-                if obj.send_status == 'Создана':
-                    if obj.send_start <= now:
-                        obj.send_start = now
-                        obj.send_status = 'Активна'
+                if obj.status == 'Создана':
+                    if obj.start_date <= now:
+                        obj.start_date = now
+                        obj.status = 'Активна'
                         obj.save()
-                if obj.send_status == 'Активна':
-                    if obj.send_finish <= now:
-                        obj.send_status = 'Завершена'
+                if obj.status == 'Активна':
+                    if obj.end_date <= now:
+                        obj.status = 'Завершена'
                         obj.save()
-                    elif obj.send_start <= now:
+                    elif obj.start_date <= now:
                         send_mail(obj)
-                        if obj.send_period == 'Ежедневно':
-                            obj.next_try += timedelta(days=1)
+                        if obj.interval == 'Ежедневно':
+                            obj.next_date += timedelta(days=1)
                             obj.save()
-                        elif obj.send_period == 'Еженедельно':
-                            obj.next_try += timedelta(days=7)
+                        elif obj.interval == 'Еженедельно':
+                            obj.next_date += timedelta(days=7)
                             obj.save()
-                        elif obj.send_period == 'Ежемесячно':
-                            obj.next_try += timedelta(days=30)
+                        elif obj.interval == 'Ежемесячно':
+                            obj.next_date += timedelta(days=30)
                             obj.save()
