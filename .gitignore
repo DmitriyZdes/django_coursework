@@ -1,0 +1,4 @@
+.env
+ipython_config.py
+*.log
+local_settings.py

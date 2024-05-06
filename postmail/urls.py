@@ -1,12 +1,14 @@
 from django.urls import path
 from postmail.apps import PostmailConfig
+from postmail.views import (MessageListView, MessageDetailView, MessageCreateView, MessageUpdateView, MessageDeleteView,
+                            MailListView, MailCreateView, MailUpdateView, MailDeleteView, LogsListView, ClientListView,
+                            ClientCreateView,
+                            ClientUpdateView, ClientDeleteView, BaseTemplateView)
 
 app_name = PostmailConfig.name
-from postmail.views import MessageListView, MessageDetailView, MessageCreateView, MessageUpdateView, MessageDeleteView, \
-    MailListView, MailCreateView, MailUpdateView, MailDeleteView, LogsListView, ClientListView, ClientCreateView, \
-    ClientUpdateView, ClientDeleteView
 
 urlpatterns = [
+    path('', BaseTemplateView.as_view(), name='main_page'),
     path('message_detail/<int:pk>/', MessageDetailView.as_view(), name='message_detail'),
     path('message_list', MessageListView.as_view(), name='message_list'),
     path('create_message', MessageCreateView.as_view(), name='create_message'),

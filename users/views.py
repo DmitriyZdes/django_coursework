@@ -1,13 +1,87 @@
-from django.urls import reverse_lazy
-from django.views.generic import CreateView
-
-from users.forms import UserRegisterForm
+from django.conf import settings
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.mail import send_mail
+from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse_lazy, reverse
+from django.contrib import messages
+from django.views import View
+from django.views.generic import CreateView, UpdateView
+from django.contrib.auth.views import LoginView as BaseLoginView, PasswordResetView
+from users.forms import UserRegisterForm, UserUpdateForm, VerificationForm
 from users.models import User
+import random
 
 # Create your views here.
+
+
+class LoginView(BaseLoginView):
+    template_name = 'users/login.html'
+
 
 class RegisterView(CreateView):
 
     model = User
-    form = UserRegisterForm
-    success_url = reverse_lazy('users/register.html')
+    form_class = UserRegisterForm
+    success_url = reverse_lazy('users:login')
+
+    def form_valid(self, form):
+        user = form.save()
+        send_mail(
+            subject='Подтверждение почты в Сервисе рассылок.',
+            message=f'Вы зарегистрировались в Сервисе рассылок. Введите код в форму подтверждения - '
+                    f'{user.verification_code}',
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[user.email]
+        )
+        return super().form_valid(form)
+
+
+class UserProfileView(LoginRequiredMixin, UpdateView):
+
+    model = User
+    form_class = UserUpdateForm
+    success_url = reverse_lazy('users:user_profile')
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
+
+class CustomPasswordResetView(PasswordResetView):
+    def form_valid(self, form):
+        # Генерация нового случайного пароля
+        new_password = ''.join([str(random.randint(0, 9)) for _ in range(12)])
+        email = form.cleaned_data['email']
+        user = User.objects.get(email=email)
+        user.set_password(new_password)
+        user.save()
+
+        send_mail(
+                subject='Восстановление пароля',
+                message=f'Ваш новый пароль: {new_password}',
+                from_email=settings.EMAIL_HOST_USER,
+                recipient_list=[user.email]
+            )
+        return super().form_valid(form)
+
+
+class VerifyEmailView(View):
+
+    model = User
+    template_name = 'users/verification.html'
+
+
+    def post(self, request, *args, **kwargs):
+        form = VerificationForm(request.POST)
+        if form.is_valid():
+            entered_code = form.cleaned_data['verification_code']
+            user_pk = kwargs.get('pk')
+            user = get_object_or_404(User, pk=user_pk)
+            if entered_code == user.verify_code:
+                user.is_active = True
+                user.save()
+                messages.success(request, 'Аккаунт успешно активирован!')
+                return redirect(reverse('users:login'))
+            else:
+                messages.error(request, 'Неверный код верификации. Попробуйте снова.')
+
+            return render(request, self.template_name, {'form': form})

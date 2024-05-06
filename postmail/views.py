@@ -1,13 +1,23 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render
 from django.urls import reverse_lazy
-from django.views import generic
-from django.views.generic import CreateView, UpdateView, DeleteView, DetailView, ListView
-
-from postmail.forms import MessageForm, MailForm, ClientForm, LogsForm
+from django.views.generic import CreateView, UpdateView, DeleteView, DetailView, ListView, TemplateView
+from postmail.forms import MessageForm, MailForm, ClientForm
 from postmail.models import Client, Mail, Message, Logs
-
 # Create your views here.
+
+
+class BaseTemplateView(TemplateView):
+
+    template_name = 'postmail/stats.html'
+
+    def get_context_data(self, **kwargs):
+
+        context_data = super().get_context_data(**kwargs)
+        context_data['mails_list'] = Mail.objects.all().count()
+        context_data['mails_active_list'] = Mail.objects.filter(is_active=True).count()
+        context_data['client_unique_list'] = Client.objects.all().count()
+        return context_data
+
 
 class MessageListView(LoginRequiredMixin, ListView):
 
@@ -17,6 +27,7 @@ class MessageListView(LoginRequiredMixin, ListView):
 class MessageDetailView(LoginRequiredMixin, DetailView):
 
     model = Message
+
 
 class MessageCreateView(LoginRequiredMixin, CreateView):
 
@@ -46,6 +57,7 @@ class MessageDeleteView(LoginRequiredMixin, DeleteView):
     model = Message
     success_url = reverse_lazy('postmail:message_list')
 
+
 class MailCreateView(LoginRequiredMixin, CreateView):
 
     model = Mail
@@ -58,15 +70,18 @@ class MailCreateView(LoginRequiredMixin, CreateView):
         queryset = queryset.filter(id=self.kwargs.get('pk'))
         return queryset
 
+
 class MailUpdateView(UpdateView):
 
     model = Mail
     form_class = MailForm
     success_url = reverse_lazy('postmail:mail_list')
 
+
 class MailListView(LoginRequiredMixin, ListView):
 
     model = Mail
+
 
 class MailDeleteView(DeleteView):
 
@@ -75,12 +90,14 @@ class MailDeleteView(DeleteView):
 
 
 class LogsListView(LoginRequiredMixin, ListView):
+
     model = Logs
 
     def get_queryset(self):
         queryset = super().get_queryset()
         queryset = queryset.filter(logs_owner=self.request.user)
         return queryset
+
 
 class ClientCreateView(LoginRequiredMixin, CreateView):
 
@@ -94,6 +111,7 @@ class ClientCreateView(LoginRequiredMixin, CreateView):
         send_params.save()
         return super().form_valid(form)
 
+
 class ClientListView(LoginRequiredMixin, ListView):
 
     model = Client
@@ -103,11 +121,13 @@ class ClientListView(LoginRequiredMixin, ListView):
         queryset = queryset.filter(client_owner=self.request.user)
         return queryset
 
+
 class ClientUpdateView(LoginRequiredMixin, UpdateView):
 
     model = Client
     form_class = ClientForm
     success_url = reverse_lazy('postmail:client_list')
+
 
 class ClientDeleteView(LoginRequiredMixin, DeleteView):
 

@@ -11,13 +11,14 @@ class Client(models.Model):
     patronymic = models.CharField(max_length=50, verbose_name='отчество')
     email = models.EmailField(unique=True, verbose_name='почта')
     comment = models.CharField(max_length=100, verbose_name='комментарий')
-    client_owner = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name='пользователь',
-                                      on_delete=models.SET_NULL, blank=True, null=True)
+    client_owner = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                     verbose_name='пользователь', on_delete=models.SET_NULL, blank=True, null=True)
 
     class Meta:
 
         verbose_name = 'клиент'
         verbose_name_plural = 'клиенты'
+
 
     def __str__(self):
 
@@ -50,8 +51,8 @@ class Mail(models.Model):
     interval = models.CharField(default="разовая", max_length=50, verbose_name="интервал")
     status = models.CharField(max_length=50, verbose_name="статус")
     is_active = models.BooleanField(default=True, verbose_name="действующая")
-    mail_owner = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name='пользователь',
-                                      on_delete=models.SET_NULL, blank=True, null=True)
+    mail_owner = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                   verbose_name='пользователь', on_delete=models.SET_NULL, blank=True, null=True)
 
     class Meta:
         verbose_name = 'рассылка'
@@ -68,8 +69,8 @@ class Logs(models.Model):
     last_mail_time = models.DateTimeField(auto_now=True, verbose_name='время последней рассылки')
     status = models.CharField(max_length=50, verbose_name='статус попытки')
     response = models.CharField(max_length=200, verbose_name="ответ почтового сервера", blank=True, null=True)
-    logs_owner = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name='пользователь',
-                                      on_delete=models.SET_NULL, blank=True, null=True)
+    logs_owner = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                   verbose_name='пользователь', on_delete=models.SET_NULL, blank=True, null=True)
 
     class Meta:
         verbose_name = 'лог'

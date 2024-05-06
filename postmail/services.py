@@ -10,8 +10,8 @@ def send_mail(obj: Mail):
     for obj_email in obj.client.all():
         try:
             email = EmailMultiAlternatives(
-                subject=obj.name.title,
-                body=obj.mail_title.text,
+                subject=obj.message.title,
+                body=obj.message.body,
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 to=[obj_email.client],
             )
@@ -20,20 +20,20 @@ def send_mail(obj: Mail):
 
             email.send()
             Logs.objects.create(
-                send_name=obj.mail_title.title,
+                send_name=obj.message.title,
                 last_try=now,
                 status_try='Успешно',
-                logs_owner=obj.options_owner,
-                send_email=obj_email.client_email
+                logs_owner=obj.logs_owner,
+                send_email=obj_email.email
             )
-        except smtplib.SMTPException as e:
+        except smtplib.SMTPException as exc:
             Logs.objects.create(
-                send_name=obj.mail_title.title,
+                send_name=obj.message.title,
                 last_try=now,
                 status_try='Ошибка',
-                logs_owner=obj.mail_owner,
-                server_answer=e,
-                send_email=obj_email.client_email
+                logs_owner=obj.logs_owner,
+                server_answer=exc,
+                send_email=obj_email.email
             )
 
 

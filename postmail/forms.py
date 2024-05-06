@@ -23,13 +23,14 @@ class ClientForm(StyleFormMixin, forms.ModelForm):
         model = Client
         fields = '__all__'
 
+
 class LogsForm(StyleFormMixin, forms.ModelForm):
 
     class Meta:
         model = Logs
         fields = ('mail', 'status',)
 
+
 class MailForm(StyleFormMixin, forms.ModelForm):
     model = Mail
     fields = '__all__'
-
