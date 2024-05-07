@@ -1,4 +1,4 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView, DeleteView, DetailView, ListView, TemplateView
 from postmail.forms import MessageForm, MailForm, ClientForm
@@ -71,11 +71,12 @@ class MailCreateView(LoginRequiredMixin, CreateView):
         return queryset
 
 
-class MailUpdateView(UpdateView):
+class MailUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
 
     model = Mail
     form_class = MailForm
     success_url = reverse_lazy('postmail:mail_list')
+    permission_required = ('postmail.deactivate_articles')
 
 
 class MailListView(LoginRequiredMixin, ListView):

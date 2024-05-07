@@ -19,7 +19,6 @@ class Client(models.Model):
         verbose_name = 'клиент'
         verbose_name_plural = 'клиенты'
 
-
     def __str__(self):
 
         return f'{self.first_name}, {self.last_name}, {self.email}, {self.comment}'
@@ -57,6 +56,10 @@ class Mail(models.Model):
     class Meta:
         verbose_name = 'рассылка'
         verbose_name_plural = 'рассылки'
+        permissions = [
+            ('deactivate_articles', 'Can deactivate articles'),
+
+        ]
 
     def __str__(self):
 
