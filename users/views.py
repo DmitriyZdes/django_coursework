@@ -18,7 +18,7 @@ class RegisterView(CreateView):
 
     model = User
     form_class = UserRegisterForm
-    success_url = reverse_lazy('users:login')
+    success_url = reverse_lazy('users:user_list')
 
     def form_valid(self, form):
         user = form.save()
@@ -36,7 +36,7 @@ class UserProfileView(LoginRequiredMixin, UpdateView):
 
     model = User
     form_class = UserUpdateForm
-    success_url = reverse_lazy('users:user_profile')
+    success_url = reverse_lazy('users:user_list')
 
     def get_object(self, queryset=None):
         return self.request.user
@@ -95,7 +95,6 @@ class UserListView(PermissionRequiredMixin, ListView):
 class UserDeleteView(UserPassesTestMixin, PermissionRequiredMixin, DeleteView):
     model = User
     permission_required = 'users.delete_user'
-    login_url = 'users:login'
     success_url = reverse_lazy('users:user_list')
 
     def test_func(self):
