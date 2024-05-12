@@ -179,36 +179,8 @@
         </li>
     </ul>
 </div>
-
-
-<svg xmlns="http://www.w3.org/2000/svg" class="d-none">
-    <symbol id="check" viewBox="0 0 16 16">
-        <title>Check</title>
-        <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
-    </symbol>
-</svg>
-
 <div class="container py-3">
-
-    {% block content %}
-    {% endblock %}
-    {% block blog %}
-    {% endblock %}
-
-
-    <footer class="pt-4 my-md-5 pt-md-5 border-top">
-        <div class="row">
-            <div class="col-12 col-md">
-                <img src="{% static 'brand/mailer_logo.svg' %}" alt="Logo" width="30" height="24"
-                     class="d-inline-block align-text-top">
-                <small class="d-block mb-3 text-body-secondary">&copy; 2023 - {% now 'Y' %}</small>
-            </div>
-        </div>
-    </footer>
+    <header>
+        {% include 'postmail/includes/inc_navigation_menu.html' %}
+    </header>
 </div>
-<script src="{% static 'js/bootstrap.bundle.min.js' %}"
-        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-        crossorigin="anonymous"></script>
-
-</body>
-</html>

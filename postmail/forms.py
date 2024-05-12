@@ -32,5 +32,6 @@ class LogsForm(StyleFormMixin, forms.ModelForm):
 
 
 class MailForm(StyleFormMixin, forms.ModelForm):
-    model = Mail
-    fields = '__all__'
+    class Meta:
+        model = Mail
+        fields = '__all__'

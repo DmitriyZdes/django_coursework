@@ -1,21 +1,17 @@
 from django.conf import settings
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin, PermissionRequiredMixin
 from django.core.mail import send_mail
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
 from django.contrib import messages
 from django.views import View
-from django.views.generic import CreateView, UpdateView
-from django.contrib.auth.views import LoginView as BaseLoginView, PasswordResetView
+from django.views.generic import CreateView, UpdateView, DeleteView, ListView
+from django.contrib.auth.views import PasswordResetView
 from users.forms import UserRegisterForm, UserUpdateForm, VerificationForm
 from users.models import User
 import random
 
 # Create your views here.
-
-
-class LoginView(BaseLoginView):
-    template_name = 'users/login.html'
 
 
 class RegisterView(CreateView):
@@ -69,7 +65,6 @@ class VerifyEmailView(View):
     model = User
     template_name = 'users/verification.html'
 
-
     def post(self, request, *args, **kwargs):
         form = VerificationForm(request.POST)
         if form.is_valid():
@@ -85,3 +80,23 @@ class VerifyEmailView(View):
                 messages.error(request, 'Неверный код верификации. Попробуйте снова.')
 
             return render(request, self.template_name, {'form': form})
+
+
+class UserListView(PermissionRequiredMixin, ListView):
+    model = User
+    permission_required = 'users.view_user'
+
+    def get_context_data(self, *args, **kwargs):
+        context_data = super().get_context_data(*args, **kwargs)
+        context_data['users_list'] = User.objects.all()
+        return context_data
+
+
+class UserDeleteView(UserPassesTestMixin, PermissionRequiredMixin, DeleteView):
+    model = User
+    permission_required = 'users.delete_user'
+    login_url = 'users:login'
+    success_url = reverse_lazy('users:user_list')
+
+    def test_func(self):
+        return self.request.user.is_staff
